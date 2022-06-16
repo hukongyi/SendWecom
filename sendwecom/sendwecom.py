@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 ###
-# File: /home/hky/github/SendWecom/sendwecom.py
-# Project: /home/hky/github/SendWecom
+# File: /home/hky/anisotropy/code/testwecom.py
+# Project: /home/hky/anisotropy/code
 # Created Date: 2022-05-01 16:29:53
 # Author: Hu Kongyi
 # Email:hukongyi@ihep.ac.cn
@@ -130,7 +130,7 @@ def send_to_wecom(content, content_type="text"):
     wecom_aid = ""
     wecom_secret = ""
     wecom_touid = ""
-    if wecom_touid == None:
+    if wecom_touid is None:
     	wecom_touid = "@all"
     if content_type == "text":
         return send_to_wecom_text(content,
@@ -190,5 +190,5 @@ def test():
 
 if __name__ == "__main__":
     test()
-    
-    
+    # res = send_to_wecom("/home/hky/latex/参数对比/image/sumNb1.jpg", content_type="image")
+    # print(res)
