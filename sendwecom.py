@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 ###
-# File: /home/hky/github/SendWecom/sendwecom.py
+# File: /home/hky/github/SendWecom/testwecom.py
 # Project: /home/hky/github/SendWecom
-# Created Date: 2022-05-25 13:06:59
+# Created Date: 2022-05-01 16:29:53
 # Author: Hu Kongyi
 # Email:hukongyi@ihep.ac.cn
 # -----
-# Last Modified: 2022-05-25 13:14:10
+# Last Modified: 2022-06-10 17:59:55
 # Modified By: Hu Kongyi
 # -----
 # HISTORY:
-# Date      	By			Comments
+# Date      	By      	Comments
 # ----------	--------	----------------------------------------------------
+# 2022-06-10	K.Y.Hu		add except send
 # 2022-05-25	K.Y.Hu		add Decorators
 # 2022-05-01	K.Y.Hu		finish send text, image and markdown
 ###
@@ -23,16 +24,6 @@ import datetime
 import sys
 
 import requests
-
-# 在这里写好需要发送的企业号，小程序号，密钥与用户名
-# 企业ID
-wecom_cid = ""
-# 应用ID
-wecom_aid = ""
-# 应用secret
-wecom_secret = ""
-# 发送的用户名
-wecom_touid = ""
 
 
 def send_to_wecom_text(text, wecom_cid, wecom_aid, wecom_secret, wecom_touid='@all'):
@@ -62,8 +53,7 @@ def send_to_wecom_image(image_content, wecom_cid, wecom_aid, wecom_secret, wecom
     access_token = json.loads(response).get('access_token')
     if access_token and len(access_token) > 0:
         upload_url = f'https://qyapi.weixin.qq.com/cgi-bin/media/upload?access_token={access_token}&type=image'
-        upload_response = requests.post(
-            upload_url, files={"picture": image_content}).json()
+        upload_response = requests.post(upload_url, files={"picture": image_content}).json()
         if "media_id" in upload_response:
             media_id = upload_response['media_id']
         else:
@@ -92,8 +82,7 @@ def send_to_wecom_file(file_content, wecom_cid, wecom_aid, wecom_secret, wecom_t
     access_token = json.loads(response).get('access_token')
     if access_token and len(access_token) > 0:
         upload_url = f'https://qyapi.weixin.qq.com/cgi-bin/media/upload?access_token={access_token}&type=file'
-        upload_response = requests.post(
-            upload_url, files={"file": file_content}).json()
+        upload_response = requests.post(upload_url, files={"file": file_content}).json()
         if "media_id" in upload_response:
             media_id = upload_response['media_id']
         else:
@@ -137,6 +126,12 @@ def send_to_wecom_markdown(text, wecom_cid, wecom_aid, wecom_secret, wecom_touid
 
 
 def send_to_wecom(content, content_type="text"):
+    wecom_cid = ""
+    wecom_aid = ""
+    wecom_secret = ""
+    wecom_touid = ""
+    if wecom_touid == None:
+    	wecom_touid = "@all"
     if content_type == "text":
         return send_to_wecom_text(content,
                                   wecom_cid,
@@ -171,9 +166,19 @@ def send_to_wecom_after_finish(function):
 
     def new_function(*args, **kwargs):
         start_time = time.time()
-        function(*args, **kwargs)
-        send_to_wecom(
-            f"{os.path.basename(sys.argv[0])}已完成\n用时：{datetime.timedelta(seconds=time.time() - start_time)}")
+        try:
+            output = function(*args, **kwargs)
+        except KeyboardInterrupt:
+            send_to_wecom(f"{os.path.basename(sys.argv[0])} 键盘中断!!!!")
+        except BaseException as err:
+            send_to_wecom(f"{os.path.basename(sys.argv[0])} 报错!!!!")
+            send_to_wecom(f"Unexpected {err=}, {type(err)=}")
+        else:
+            send_to_wecom(
+                f"{os.path.basename(sys.argv[0])}已完成\n用时：{datetime.timedelta(seconds=time.time() - start_time)}"
+            )
+            if output is not None:
+                send_to_wecom(f"{output=}")
 
     return new_function
 
@@ -185,3 +190,5 @@ def test():
 
 if __name__ == "__main__":
     test()
+    
+    
