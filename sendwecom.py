@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 ###
-# File: /home/hky/github/SendWecom/testwecom.py
+# File: /home/hky/github/SendWecom/sendwecom.py
 # Project: /home/hky/github/SendWecom
 # Created Date: 2022-05-01 16:29:53
 # Author: Hu Kongyi
