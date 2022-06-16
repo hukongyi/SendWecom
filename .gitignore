@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+sendwecom/wecom_inform.json
+
+
 # Distribution / packaging
 .Python
 build/

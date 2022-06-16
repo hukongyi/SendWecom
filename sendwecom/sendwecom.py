@@ -7,7 +7,7 @@
 # Author: Hu Kongyi
 # Email:hukongyi@ihep.ac.cn
 # -----
-# Last Modified: 2022-06-10 17:59:55
+# Last Modified: 2022-06-16 16:55:50
 # Modified By: Hu Kongyi
 # -----
 # HISTORY:
@@ -26,7 +26,11 @@ import sys
 import requests
 
 
-def send_to_wecom_text(text, wecom_cid, wecom_aid, wecom_secret, wecom_touid='@all'):
+def send_to_wecom_text(text,
+                       wecom_cid,
+                       wecom_aid,
+                       wecom_secret,
+                       wecom_touid='@all'):
     get_token_url = f"https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={wecom_cid}&corpsecret={wecom_secret}"
     response = requests.get(get_token_url).content
     access_token = json.loads(response).get('access_token')
@@ -47,13 +51,20 @@ def send_to_wecom_text(text, wecom_cid, wecom_aid, wecom_secret, wecom_touid='@a
         return False
 
 
-def send_to_wecom_image(image_content, wecom_cid, wecom_aid, wecom_secret, wecom_touid='@all'):
+def send_to_wecom_image(image_content,
+                        wecom_cid,
+                        wecom_aid,
+                        wecom_secret,
+                        wecom_touid='@all'):
     get_token_url = f"https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={wecom_cid}&corpsecret={wecom_secret}"
     response = requests.get(get_token_url).content
     access_token = json.loads(response).get('access_token')
     if access_token and len(access_token) > 0:
         upload_url = f'https://qyapi.weixin.qq.com/cgi-bin/media/upload?access_token={access_token}&type=image'
-        upload_response = requests.post(upload_url, files={"picture": image_content}).json()
+        upload_response = requests.post(upload_url,
+                                        files={
+                                            "picture": image_content
+                                        }).json()
         if "media_id" in upload_response:
             media_id = upload_response['media_id']
         else:
@@ -76,13 +87,20 @@ def send_to_wecom_image(image_content, wecom_cid, wecom_aid, wecom_secret, wecom
         return False
 
 
-def send_to_wecom_file(file_content, wecom_cid, wecom_aid, wecom_secret, wecom_touid='@all'):
+def send_to_wecom_file(file_content,
+                       wecom_cid,
+                       wecom_aid,
+                       wecom_secret,
+                       wecom_touid='@all'):
     get_token_url = f"https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={wecom_cid}&corpsecret={wecom_secret}"
     response = requests.get(get_token_url).content
     access_token = json.loads(response).get('access_token')
     if access_token and len(access_token) > 0:
         upload_url = f'https://qyapi.weixin.qq.com/cgi-bin/media/upload?access_token={access_token}&type=file'
-        upload_response = requests.post(upload_url, files={"file": file_content}).json()
+        upload_response = requests.post(upload_url,
+                                        files={
+                                            "file": file_content
+                                        }).json()
         if "media_id" in upload_response:
             media_id = upload_response['media_id']
         else:
@@ -104,7 +122,11 @@ def send_to_wecom_file(file_content, wecom_cid, wecom_aid, wecom_secret, wecom_t
         return False
 
 
-def send_to_wecom_markdown(text, wecom_cid, wecom_aid, wecom_secret, wecom_touid='@all'):
+def send_to_wecom_markdown(text,
+                           wecom_cid,
+                           wecom_aid,
+                           wecom_secret,
+                           wecom_touid='@all'):
     get_token_url = f"https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={wecom_cid}&corpsecret={wecom_secret}"
     response = requests.get(get_token_url).content
     access_token = json.loads(response).get('access_token')
@@ -126,12 +148,15 @@ def send_to_wecom_markdown(text, wecom_cid, wecom_aid, wecom_secret, wecom_touid
 
 
 def send_to_wecom(content, content_type="text"):
-    wecom_cid = ""
-    wecom_aid = ""
-    wecom_secret = ""
-    wecom_touid = ""
+    with open('/home/hky/github/SendWecom/sendwecom/wecom_inform.json',
+              "r") as f:
+        data = json.load(f)
+    wecom_cid = data["wecom_cid"]
+    wecom_aid = data["wecom_aid"]
+    wecom_secret = data["wecom_secret"]
+    wecom_touid = data["wecom_touid"]
     if wecom_touid is None:
-    	wecom_touid = "@all"
+        wecom_touid = "@all"
     if content_type == "text":
         return send_to_wecom_text(content,
                                   wecom_cid,
@@ -163,7 +188,6 @@ def send_to_wecom(content, content_type="text"):
 
 
 def send_to_wecom_after_finish(function):
-
     def new_function(*args, **kwargs):
         start_time = time.time()
         try:
